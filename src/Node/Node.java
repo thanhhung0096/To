@@ -4,9 +4,9 @@ import java.awt.List;
 import java.util.ArrayList;
 
 public class Node {
-	public int ID;//
-	public double demand;//
-	public int service_time;
+	private int ID;//
+	private double demand;//
+	private int service_time;
 	
 	
 	public Node findNodeClosed(ArrayList<Node> listNode)

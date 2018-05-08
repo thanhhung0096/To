@@ -12,12 +12,19 @@ public class car {
 	private ArrayList<Node> passedNodes = new ArrayList<Node>();
 	private Node currentNode = new Node(0, 0);
 	private boolean end = false;
-	
-	
+	private double cost = 0 ;
+	private double distance = 0;
 	public car( int noiDau, int load) {
 		
 		this.noiDau = noiDau;
 		this.Load = load;
+		if(load == 2 ) 
+			this.cost += 100;
+		else if(load == 5 ) 
+			this.cost += 250;
+		else
+			this.cost += 300;
+		
 	}
 	
 	public void goTo(Node node)
@@ -26,16 +33,18 @@ public class car {
 		
 		this.hasLoaded += node.getDemand();
 		
-		this.currentNode = node;
 		
 		this.canLoadMore = ((this.Load - this.hasLoaded)  > 2)? true : false;
 		
-		this.timeTraveled += (int)_main.matrixTime[currentNode.getID()][node.getID()] + node.service_time;
+		this.timeTraveled += (int)_main.matrixTime[currentNode.getID()][node.getID()] + node.getService_time();
 		if (! this.canLoadMore || this.timeTraveled > 20*60)
 		{
 			this.end = true;
 		}
+		this.distance +=  _main.matrixDistance[this.currentNode.getID()][node.getID()];
+		
 		System.out.println("\t* " + node);
+		this.currentNode = node;
 	}
 	
 	public void Go(ArrayList<Node> Nodes)
@@ -55,6 +64,8 @@ public class car {
 		
 		goTo(this.currentNode.findNodeClosed(_main.finishNodes));
 		
+		System.out.println("\tTotal Distance: " +  this.distance +"\tTotal Cost: "
+		+ this.getCost()+ "\tTotal time: " + this.getTimeTraveled());
 	}
 	
 	public String getBienSo() {
@@ -138,11 +149,29 @@ public class car {
 		this.end = end;
 	}
 
+	public double getCost() {
+		if(this.Load == 2)
+			return this.cost + this.distance * 1.6296;
+		if(this.Load == 5)
+			return this.cost + this.distance*2.4056;
+		return this.cost + this.distance*2.5608;
+		
+	}
+
+	
+	public double getDistance() {
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
 		
-		return "Xe ID: "+ this.noiDau + ", Load: " + this.Load;
+		return "Xe Load: " + this.Load;
 	}
 	
 	public ArrayList<Node> listNodeCanGo(ArrayList<Node> Nodes)
