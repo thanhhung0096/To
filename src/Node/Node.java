@@ -63,6 +63,7 @@ public class Node {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return "Node ID: " + this.ID+ ", Demand: " + this.demand + ", service time: " + this.service_time;
+		return (this.ID < 18) ? "Node ID: " + this.ID+ ", Demand: " + this.demand + ", service time: " + this.service_time
+				: "Node ID:" + this.ID + " (End)";
 	}
 }

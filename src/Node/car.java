@@ -9,7 +9,7 @@ public class car {
 	private int hasLoaded = 0;
 	private boolean canLoadMore = true;
 	private int timeTraveled = 0;
-	private ArrayList<Node> passedNodes = new ArrayList<Node>();
+	public ArrayList<Node> passedNodes = new ArrayList<Node>();
 	private Node currentNode = new Node(0, 0);
 	private boolean end = false;
 	private double cost = 0 ;
@@ -43,7 +43,7 @@ public class car {
 		}
 		this.distance +=  _main.matrixDistance[this.currentNode.getID()][node.getID()];
 		
-		System.out.println("\t* " + node);
+		
 		this.currentNode = node;
 	}
 	
@@ -61,11 +61,8 @@ public class car {
 			
 			Nodes.remove(goNext);
 		}
+//		goHome();
 		
-		goTo(this.currentNode.findNodeClosed(_main.finishNodes));
-		
-		System.out.println("\tTotal Distance: " +  this.distance +"\tTotal Cost: "
-		+ this.getCost()+ "\tTotal time: " + this.getTimeTraveled());
 	}
 	
 	public String getBienSo() {
@@ -150,6 +147,7 @@ public class car {
 	}
 
 	public double getCost() {
+		
 		if(this.Load == 2)
 			return this.cost + this.distance * 1.6296;
 		if(this.Load == 5)
@@ -170,8 +168,14 @@ public class car {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		
-		return "Xe Load: " + this.Load;
+		String s = "Xe " + this.Load + "T";
+		for(int i = 0 ; i < this.getPassedNodes().size() ; i++)
+		{
+			s += "\n\t*" + this.getPassedNodes().get(i);
+		}
+		s+="\n\tTotal Distance: " +  this.distance +"\tTotal Cost: "
+				+ this.getCost()+ "\tTotal time: " + this.getTimeTraveled() + "\n";
+		return s;
 	}
 	
 	public ArrayList<Node> listNodeCanGo(ArrayList<Node> Nodes)
@@ -187,5 +191,24 @@ public class car {
 			}
 		}
 		return output;
+	}
+	public void goHome()
+	{
+		if((_main.matrixDistance[this.currentNode.getID()][19] + _main.matrixDistance[19][0])
+			> (_main.matrixDistance[this.currentNode.getID()][18] + _main.matrixDistance[18][0])) // BD > HM
+				{
+					goTo(_main.endAtHocMon);
+				}
+		else
+			goTo(_main.endAtHocMon);
+	}
+	
+	public void exchange2Node(int i, int j )
+	{
+//		System.out.println("Before: " + this.passedNodes);
+		Node tmp = this.getPassedNodes().get(i);
+		this.passedNodes.set(i, this.passedNodes.get(j));
+		this.passedNodes.set(j, tmp);
+//		System.out.println("After : " + this.passedNodes);
 	}
 }

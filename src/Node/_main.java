@@ -1,10 +1,12 @@
 package Node;
 
+
 import java.io.File;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.CellType;
@@ -13,7 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import tabu.*;
 public class _main{
 	public static double[][] matrixTime;
 	public static double[][] matrixDistance;
@@ -32,8 +34,8 @@ public class _main{
 		
 	finishNodes.add(endAtBinhDuong);
 	finishNodes.add(endAtHocMon);
-	matrixTime = readMatrixExcel("ma-trận-thời-gian.xlsx")	;
-	matrixDistance = readMatrixExcel("MA-TRẬN-KC-chinh-sua.xlsx");
+	matrixTime = readMatrixExcel("TimeMatrix.xlsx")	;
+	matrixDistance = readMatrixExcel("DistantMatrix.xlsx");
 	
 	initDataAndNodes("DATA-NHU-CAU.xlsx");
 	
@@ -42,20 +44,19 @@ public class _main{
 	{
 		System.out.println("\n\n\t\t\t-----------" +listDate.get(currentDay)+"-------------------");
 		ArrayList<Node> NodesToday = listNodebaseDay.get(currentDay);
+		showDemand(NodesToday);
 		ArrayList<car> listCar = initCar();
 		
-		for(int i = 0 ; i < listCar.size() ; i++)
-		{
-			if(NodesToday.size() == 0)
-				break;
-			System.out.println("+ " +listCar.get(i) + " has Loaded at:");
-			listCar.get(i).Go(NodesToday);
-		}
-
+		ArrayList<car> firstSolution = initSolution(listCar, NodesToday);
+		TabuSearch tabu = new TabuSearch(firstSolution);
+		tabu.exchange1Route();
+		
 		
 	}
 	
+	
 	}
+	
 	
 	public static double[][] readMatrixExcel(String pathFile)
 	{
@@ -109,7 +110,7 @@ public class _main{
 	public static ArrayList<car> initCar()
 	{
 		ArrayList<car> listCar = new ArrayList<car>();
-		for (int i = 0; i <=15;i++ )
+		for (int i = 0; i <=14;i++ )
 		{
 			if(i<=9)
 			{
@@ -121,7 +122,7 @@ public class _main{
 			}
 		}
 		
-		for (int i = 0; i <=15;i++ )
+		for (int i = 0; i <=14;i++ )
 		{
 			if(i<=10)
 			{
@@ -133,7 +134,7 @@ public class _main{
 			}
 		}
 		
-		for (int i = 0; i <=15;i++ )
+		for (int i = 0; i <=14;i++ )
 		{
 			if(i<=8)
 			{
@@ -159,7 +160,7 @@ public class _main{
 
 		    int rows; // No of rows
 		    rows = sheet.getPhysicalNumberOfRows();
-		    System.out.println(rows);
+//		    System.out.println(rows);
 		    int cols; // No of columns
 		    cols = sheet.getRow(0).getLastCellNum();
 		    short cellDate =0;
@@ -212,5 +213,96 @@ public class _main{
 		}
 		
 	}
+	public static ArrayList<car> initSolution(ArrayList<car> listCar, ArrayList<Node> nodes){
+		ArrayList<car> initSolution = new ArrayList<>();
+		ArrayList<car> xe8Ts = new ArrayList<>();
+		ArrayList<car> xe5Ts = new ArrayList<>();
+		ArrayList<car> xe2Ts = new ArrayList<>();
+		for (int i =0 ; i< 15 ; i++)
+		{
+			xe8Ts.add(listCar.get(i));
+			xe5Ts.add(listCar.get(i+15));
+			xe2Ts.add(listCar.get(i+30));
+			
+		}
 	
+		
+		while(nodes.size() > 0 )
+		{
+			ArrayList<Integer> listDemand = new ArrayList<>();
+			for (Node n : nodes)
+				listDemand.add((int) n.getDemand());
+			int TH = checkTH(listDemand);
+			car c;
+//			showDemand(nodes);
+			switch (TH)
+			{
+			case 1:
+				c = xe2Ts.get(0);
+				xe2Ts.remove(c);
+	
+				c.Go(nodes);
+				initSolution.add(c);
+				break;
+			case 2:
+				c = xe5Ts.get(0);
+				xe5Ts.remove(c);
+				
+				c.Go(nodes);
+				initSolution.add(c);
+				break;
+			case 3:
+				c = xe8Ts.get(0);
+				
+				xe8Ts.remove(0);
+				c.Go(nodes);
+				initSolution.add(c);
+				break;
+
+			}
+//			System.out.println(nodes);
+			
+		}
+		//Check again
+//		System.out.println("Init Solution: " + initSolution);
+		for(int i = 0 ; i < initSolution.size() ; i++){
+			car tmp = initSolution.get(i);
+			if(tmp.getLoad() - tmp.getHasLoaded() >2)
+			{
+				car c  = new car(tmp.getNoiDau(), tmp.getHasLoaded());
+				for(int j = 0 ; j < tmp.getPassedNodes().size() ; j++)
+				{
+					c.goTo(tmp.getPassedNodes().get(j));
+				}
+				initSolution.set(i,c);
+			}
+		}
+		return initSolution;
+	}
+	
+	public static int checkTH(ArrayList<Integer> demand)
+	{
+		int TH = 0;
+		if(demand.size() == 1 && demand.get(0) == 2)
+			TH = 1;
+		else if( (demand.size() == 1 && demand.get(0) == 5) || (demand.size() == 2 && demand.get(0) == 2 && demand.get(1) == 2 )
+								|| (!demand.contains(2) && !demand.contains(8)))
+			TH = 2;
+		else
+			TH =3;
+//		System.out.println(TH);
+		return TH;
+	}
+	public static void showDemand(ArrayList<Node> nodes)
+	{
+		System.out.print("Demand: ");
+		for(int i= 0 ; i < nodes.size() ; i++)
+		{
+			if(i==0)
+				System.out.print(nodes.get(i).getDemand());
+			else
+				System.out.print(" ,"+nodes.get(i).getDemand());
+		}
+		System.out.println();
+	}
 }
