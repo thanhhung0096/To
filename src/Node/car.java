@@ -10,6 +10,7 @@ public class car {
 	private boolean canLoadMore = true;
 	private int timeTraveled = 0;
 	public ArrayList<Node> passedNodes = new ArrayList<Node>();
+	public ArrayList<Node> bestOfTabu = new ArrayList<Node>();
 	private Node currentNode = new Node(0, 0);
 	private boolean end = false;
 	private double cost = 0 ;
@@ -18,12 +19,6 @@ public class car {
 		
 		this.noiDau = noiDau;
 		this.Load = load;
-		if(load == 2 ) 
-			this.cost += 100;
-		else if(load == 5 ) 
-			this.cost += 250;
-		else
-			this.cost += 300;
 		
 	}
 	
@@ -115,6 +110,20 @@ public class car {
 	}
 
 	public int getTimeTraveled() {
+		int t = 0;
+		for(int i = 0 ; i < this.passedNodes.size();i++)
+		{
+			if(i ==0)
+			{
+				t += _main.matrixTime[0][this.passedNodes.get(0).getID()] + this.passedNodes.get(0).getService_time(); 
+			}
+			else
+			{
+				t += _main.matrixTime[this.passedNodes.get(i-1).getID()][this.passedNodes.get(i).getID()]
+						+ this.passedNodes.get(i).getService_time();
+			}
+		}
+		
 		return timeTraveled;
 	}
 
@@ -149,16 +158,28 @@ public class car {
 	public double getCost() {
 		
 		if(this.Load == 2)
-			return this.cost + this.distance * 1.6296;
+			return 100 + this.getDistance() * 1.6296;
 		if(this.Load == 5)
-			return this.cost + this.distance*2.4056;
-		return this.cost + this.distance*2.5608;
+			return 250 + this.getDistance()*2.4056;
+		return 300 + this.getDistance()*2.5608;
 		
 	}
 
 	
 	public double getDistance() {
-		return distance;
+		double d = 0 ; 
+		for(int i = 0 ; i < this.passedNodes.size();i++)
+		{
+			if(i ==0)
+			{
+				d += _main.matrixDistance[0][this.passedNodes.get(0).getID()]; 
+			}
+			else
+			{
+				d += _main.matrixDistance[this.passedNodes.get(i-1).getID()][this.passedNodes.get(i).getID()];
+			}
+		}
+		return d;
 	}
 
 	public void setDistance(double distance) {
@@ -173,7 +194,7 @@ public class car {
 		{
 			s += "\n\t*" + this.getPassedNodes().get(i);
 		}
-		s+="\n\tTotal Distance: " +  this.distance +"\tTotal Cost: "
+		s+="\n\tTotal Distance: " +  this.getDistance() +"\tTotal Cost: "
 				+ this.getCost()+ "\tTotal time: " + this.getTimeTraveled() + "\n";
 		return s;
 	}
@@ -211,4 +232,18 @@ public class car {
 		this.passedNodes.set(j, tmp);
 //		System.out.println("After : " + this.passedNodes);
 	}
+
+	public ArrayList<Node> getBestOfTabu() {
+		return bestOfTabu;
+	}
+
+	public void setBestOfTabu(ArrayList<Node> bestOfTabu) {
+		this.bestOfTabu = bestOfTabu;
+	}
+
+	public void setCost(double cost) {
+		this.cost = cost;
+	}
+	
+	
 }

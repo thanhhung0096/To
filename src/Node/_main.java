@@ -48,16 +48,39 @@ public class _main{
 		ArrayList<car> listCar = initCar();
 		
 		ArrayList<car> firstSolution = initSolution(listCar, NodesToday);
+//		System.out.println(firstSolution);
 		TabuSearch tabu = new TabuSearch(firstSolution);
+		
 		tabu.exchange1Route();
+		ArrayList<car> bestSolution = tabu.getBestSolution();
 		
-		
+		showSolution(bestSolution);
+
 	}
 	
 	
 	}
 	
-	
+	public static void showSolution(ArrayList<car> bestSolution)
+	{
+		for(int i = 0 ; i < bestSolution.size() ; i++)
+		{
+			System.out.println("------------");
+			if(bestSolution.get(i).getBestOfTabu().size() > 0){
+				bestSolution.get(i).goHome();
+				String s = "";
+				s = "Init solution: \n" + bestSolution.get(i);
+				bestSolution.get(i).setPassedNodes(bestSolution.get(i).getBestOfTabu());
+				bestSolution.get(i).goHome();
+				s = "Best Solution: \n" + bestSolution.get(i) + "\n" +s ;
+				System.out.println(s);
+				continue;
+			}
+			else
+				bestSolution.get(i).goHome();
+				System.out.println(bestSolution.get(i));
+		}
+	}
 	public static double[][] readMatrixExcel(String pathFile)
 	{
 		double[][] matrix = new double[20][20];
