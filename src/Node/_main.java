@@ -50,14 +50,13 @@ public class _main{
 		ArrayList<car> firstSolution = initSolution(listCar, NodesToday);
 //		System.out.println(firstSolution);
 		TabuSearch tabu = new TabuSearch(firstSolution);
-		
 		tabu.exchange1Route();
+		tabu.exchangeMoreRoute();
 		ArrayList<car> bestSolution = tabu.getBestSolution();
-		
 		showSolution(bestSolution);
-
+		System.out.println("TOTAL COST of DAY: " + tabu.getCost(bestSolution));
 	}
-	
+
 	
 	}
 	
@@ -76,9 +75,11 @@ public class _main{
 				System.out.println(s);
 				continue;
 			}
-			else
+			else{
 				bestSolution.get(i).goHome();
 				System.out.println(bestSolution.get(i));
+			}
+			
 		}
 	}
 	public static double[][] readMatrixExcel(String pathFile)

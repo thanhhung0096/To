@@ -56,7 +56,57 @@ public class TabuSearch {
 		
 		
 	}
-
+	
+	public void exchangeMoreRoute()
+	{
+		//use result of tabu1Route bestSolution
+		@SuppressWarnings("unchecked")
+		ArrayList<car> currSolution = (ArrayList<car>) bestSolution.clone();
+		for(int i = 0 ; i < currSolution.size() -1  ; i++)
+		{
+			car c1 = currSolution.get(i);
+			if(c1.getPassedNodes().size() < 3) continue;
+			
+			for(int j = i+1 ; j < currSolution.size() ; j++)
+			{
+				car c2 = currSolution.get(j);
+				ArrayList<car> testSolution = swapNodeBtw2Route(currSolution, i, j);
+				if(getCost(testSolution) < getCost(currSolution))
+				{
+					System.out.println("BINGO");
+					currSolution = testSolution;
+				}
+				
+			}
+			
+		}
+		
+		bestSolution = currSolution;
+	}
+	
+	public ArrayList<car> swapNodeBtw2Route(ArrayList<car> currSolution, int p1, int p2)
+	{
+		@SuppressWarnings("unchecked")
+		ArrayList<car> testSolution = (ArrayList<car>) currSolution.clone();
+		car c1 = testSolution.get(p1);
+		car c2 = testSolution.get(p2);
+		
+		for(int i = 0 ; i < c1.getPassedNodes().size() -1 ; i++)
+		{
+			Node n1 = c1.getPassedNodes().get(i);
+			for(int j = 0 ; j < c2.getPassedNodes().size() -1 ; j++)
+			{
+				Node n2 = c2.getPassedNodes().get(j);
+				if(n1.getDemand() == n2.getDemand())
+				{
+					Node tmp = n1;
+					c1.passedNodes.set(i, n2);
+					c2.passedNodes.set(j,tmp);
+				}
+			}
+		}
+		return testSolution;
+	}
 	public ArrayList<Node> getBestNeighbour(ArrayList<Integer> tabuList, ArrayList<Node> currSolution)
 	{
 		ArrayList<Node> bestNeighbour = new ArrayList<>();
@@ -182,7 +232,16 @@ public class TabuSearch {
 //			System.out.println(bestSolution.get(i));
 //		
 //	}
-
+	
+	public double getCost(ArrayList<car> listCar)
+	{
+		double cost  = 0;
+		for(int i=0 ; i<listCar.size() ; i++)
+		{
+			cost += listCar.get(i).getCost();
+		}
+		return cost;
+	}
 	public ArrayList<car> getInitSolution() {
 		return initSolution;
 	}
