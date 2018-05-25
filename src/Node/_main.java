@@ -56,7 +56,6 @@ public class _main{
 		showSolution(bestSolution);
 		System.out.println("TOTAL COST of DAY: " + tabu.getCost(bestSolution));
 	}
-
 	
 	}
 	

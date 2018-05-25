@@ -179,6 +179,7 @@ public class car {
 				d += _main.matrixDistance[this.passedNodes.get(i-1).getID()][this.passedNodes.get(i).getID()];
 			}
 		}
+		d += _main.matrixDistance[this.passedNodes.get(this.passedNodes.size() -1 ).getID() ][0];
 		return d;
 	}
 
